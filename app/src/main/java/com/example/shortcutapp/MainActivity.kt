@@ -1,5 +1,6 @@
 package com.example.shortcutapp
 
+import android.content.ContentValues.TAG
 import android.net.Network
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -19,6 +20,12 @@ import com.beust.klaxon.Klaxon
 import com.example.NetWork.NetWorkHandler
 import com.example.ViewModels.MyViewModel
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.google.gson.Gson
+import kotlinx.android.synthetic.main.activity_main.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private var currList = mutableListOf<Comic>()
     private var apiComics = mutableListOf<Int>()
     lateinit var answer : String
+    private val BASE_URL = "https://xkcd.com/"
 
     lateinit var viewModel: MyViewModel
 
@@ -33,6 +41,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+
+        getApiData()
 
         //current empty list of comics
         currList.add(0, Comic("Desc", "Detail", 0, "", "Comic 1"))
@@ -58,7 +69,9 @@ class MainActivity : AppCompatActivity() {
         recycleView.layoutManager = LinearLayoutManager(this)
         recycleView.adapter = adapter
 
-        //viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
+
+        viewModel.printText()
 
         var randomComic = (1..100).random()
 
@@ -72,15 +85,6 @@ class MainActivity : AppCompatActivity() {
 
             //TODO Save a variable and put (object, comics) in a list, then display the list with an adapter
             val url = "https://xkcd.com/" + x + "/info.0.json"
-
-            /*val result  = Klaxon()
-                    .parse<Comic>("""
-                        {
-                        "title": "Comic title",
-                        }
-                    """.trimIndent())
-
-            assert(result?.title  == "Comic Title") */
 
             // Request a string response from the provided URL.
             val stringRequest = StringRequest(
@@ -104,6 +108,48 @@ class MainActivity : AppCompatActivity() {
         //val dataFromApi = mapper.readValue<Comic>(answer)
 
 
+    }
+
+    private fun getApiData() {
+        val myText = findViewById<TextView>(R.id.textView)
+        val retrofitBuilder = Retrofit.Builder()
+            .addConverterFactory(GsonConverterFactory.create())
+            .baseUrl(BASE_URL)
+            .build()
+            .create(ApiInterface::class.java)
+
+        val retrofitData =  retrofitBuilder.getData()
+
+        retrofitData.enqueue(object : Callback<List<Comic>?> {
+            override fun onResponse(
+                call: Call<List<Comic>?>,
+                response: retrofit2.Response<List<Comic>?>
+            ) {
+                //Data may come as null, make non null assumtion
+                val responseBody = response.body()!!
+
+                val myString = StringBuilder()
+
+                var count = 1
+
+                for (myData in responseBody) {
+                    if (count <= 20) {
+                        myString.append(myData.title)
+                        myString.append("\n")
+                        count++
+                        println("!!! inside loop")
+                    }
+                }
+
+                myText.text = myString
+
+                //textView.text  = myString
+            }
+
+            override fun onFailure(call: Call<List<Comic>?>, error: Throwable) {
+                Log.d(TAG, "onFailure: " + error.message)
+            }
+        })
     }
 
     /*private fun getText() {

@@ -2,6 +2,7 @@ package com.example.ViewModels
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.android.volley.Request
@@ -13,12 +14,17 @@ import com.example.shortcutapp.Comic
 
 class MyViewModel() : ViewModel() {
 
+
+    private val  _response: MutableLiveData<Response<Comic>> = MutableLiveData()
+
+    val response : LiveData<Response<Comic>> = _response
+
     val currentNumber: MutableLiveData<Int> by lazy {
         MutableLiveData<Int>()
     }
 
     fun printText() {
-        println("functoin from viewmodel")
+        println("!!! function from viewmodel")
     }
 
     fun getApiData() {
@@ -27,28 +33,15 @@ class MyViewModel() : ViewModel() {
         var randomComic = (1..100).random()
         var x = randomComic.toString()
 
-
-
-        //val queue = Volley.newRequestQueue(this)
-
         //TODO Save a variable and put (object, comics) in a list, then display the list with an adapter
         val url = "https://xkcd.com/" + x + "/info.0.json"
-
-        val result  = Klaxon()
-            .parse<Comic>("""
-                        {
-                        "title": "Comic title",
-                        }
-                    """.trimIndent())
-
-        assert(result?.title  == "Comic Title")
 
         // Request a string response from the provided URL.
         val stringRequest = StringRequest(
             Request.Method.GET, url,
             Response.Listener<String> { response ->
                 Log.d("success Request", response.toString())
-                //textView.text = response.toString()
+                //textView.text = response.toString() Old version to set text
 
             },
             Response.ErrorListener {

@@ -1,8 +1,8 @@
 package com.example.shortcutapp
 
-import java.time.Month
 
-class ApiData (
+
+data class ApiData (
     val month: String,
     val num: Int,
     val link: String,
