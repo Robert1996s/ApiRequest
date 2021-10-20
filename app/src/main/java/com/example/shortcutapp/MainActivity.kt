@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-        getApiData()
+
 
         //current empty list of comics
         currList.add(0, Comic("Desc", "Detail", 0, "", "Comic 1"))
@@ -58,8 +58,11 @@ class MainActivity : AppCompatActivity() {
         val recycleView = findViewById<RecyclerView>(R.id.recycle_view)
         val adapter = Adapter(this, currList)
 
+
+
         if (NetWorkHandler.isOnline(this)) {
             getApiBtn.isEnabled = true
+            getApiData()
             println("!!! Online")
         } else {
             getApiBtn.isEnabled = false
@@ -93,7 +96,6 @@ class MainActivity : AppCompatActivity() {
                     Log.d("success Request", response.toString())
                     textView.text = response.toString()
                     answer = response
-
                 },
                 Response.ErrorListener {
                     Log.d("error", it.localizedMessage)
@@ -111,6 +113,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getApiData() {
+
+        println("!!! inside getApiData")
         val myText = findViewById<TextView>(R.id.textView)
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
@@ -128,25 +132,25 @@ class MainActivity : AppCompatActivity() {
                 //Data may come as null, make non null assumtion
                 val responseBody = response.body()!!
 
+                //println("!!! inside getApiData")
+
                 val myString = StringBuilder()
 
                 var count = 1
 
                 for (myData in responseBody) {
-                    if (count <= 20) {
                         myString.append(myData.title)
                         myString.append("\n")
                         count++
                         println("!!! inside loop")
-                    }
+
                 }
 
-                myText.text = myString
-
-                //textView.text  = myString
+                textView.text  = myString
             }
 
             override fun onFailure(call: Call<List<Comic>?>, error: Throwable) {
+                println("!!! inside getApiData")
                 Log.d(TAG, "onFailure: " + error.message)
             }
         })

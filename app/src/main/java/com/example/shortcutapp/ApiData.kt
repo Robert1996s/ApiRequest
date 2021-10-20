@@ -1,8 +1,10 @@
 package com.example.shortcutapp
 
+import com.google.gson.annotations.SerializedName
 
 
 data class ApiData (
+        @SerializedName("title")
     val month: String,
     val num: Int,
     val link: String,
