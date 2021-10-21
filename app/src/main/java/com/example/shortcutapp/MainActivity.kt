@@ -42,6 +42,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
+
+        viewModel.printText()
+
 
 
 
@@ -62,7 +66,7 @@ class MainActivity : AppCompatActivity() {
 
         if (NetWorkHandler.isOnline(this)) {
             getApiBtn.isEnabled = true
-            getApiData()
+            viewModel.getApiData()
             println("!!! Online")
         } else {
             getApiBtn.isEnabled = false
@@ -72,9 +76,7 @@ class MainActivity : AppCompatActivity() {
         recycleView.layoutManager = LinearLayoutManager(this)
         recycleView.adapter = adapter
 
-        viewModel = ViewModelProvider(this).get(MyViewModel::class.java)
 
-        viewModel.printText()
 
         var randomComic = (1..100).random()
 
@@ -113,8 +115,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getApiData() {
-
-        println("!!! inside getApiData")
         val myText = findViewById<TextView>(R.id.textView)
         val retrofitBuilder = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
@@ -132,8 +132,6 @@ class MainActivity : AppCompatActivity() {
                 //Data may come as null, make non null assumtion
                 val responseBody = response.body()!!
 
-                //println("!!! inside getApiData")
-
                 val myString = StringBuilder()
 
                 var count = 1
@@ -143,7 +141,6 @@ class MainActivity : AppCompatActivity() {
                         myString.append("\n")
                         count++
                         println("!!! inside loop")
-
                 }
 
                 textView.text  = myString
