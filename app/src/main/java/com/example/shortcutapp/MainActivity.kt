@@ -49,9 +49,11 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
         //current empty list of comics
         currList.add(0, Comic("Desc", "Detail", 0, "", "Comic 1"))
         currList.add(1, Comic("Desc", "Det", 1, "", "Comic 2"))
+        currList.add(2, Comic("Desc new", "detailsss", 2, "url?", "Comic 3"))
 
 
         val mapper = jacksonObjectMapper()
